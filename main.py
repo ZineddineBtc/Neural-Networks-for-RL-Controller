@@ -1,4 +1,4 @@
-import pandas as pd
+from pandas import read_csv, to_numeric
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -42,16 +42,16 @@ def plot_metrics(history, metric_name, title, ylim=5):
     plt.show()
 
 def plot_predictions(test_Y, Y_pred, history, output_heads):
-    for i in range(len(output_heads)):
-	    plot_diff(test_Y[i], Y_pred[i], title=output_heads[i])
-
+    # for i in range(len(output_heads)):
+	#     plot_diff(test_Y[i], Y_pred[i], title=output_heads[i])
+    # return
 	# Plot RMSE
     for head in output_heads:
-	    plot_metrics(history, metric_name=head+"_output_root_mean_squared_error", title=head+" RMSE", ylim=15)
+	    plot_metrics(history, metric_name="root_mean_squared_error", title=head+" RMSE", ylim=15)
 
 	# Plot loss
     for head in output_heads:
-	    plot_metrics(history, metric_name=head+"_output_loss", title=head+" LOSS", ylim=50)
+	    plot_metrics(history, metric_name="loss", title=head+" LOSS", ylim=50)
 	
 def evaluate_model(model, norm_val_x, val_y, output_heads):
     # Test the model and print loss and rmse for both outputs
@@ -71,13 +71,9 @@ def format_output(data, output_heads):
         y_list.append(np.array(data.pop(column)))
     return y_list
 
-def norm(x, train_stats):
-    return (x - train_stats["mean"]) / train_stats["std"]
 
 def main():
-    
-    
-    data = pd.read_csv("data.csv")
+    data = read_csv("data.csv")
     output_heads = ["pd"]
 
     unused_indexes = list(range(24))
@@ -86,32 +82,37 @@ def main():
     unused_indexes.remove(5)  # uclp 2
     unused_indexes.remove(11)  # pd
     data = data.drop(data.columns[unused_indexes], axis=1)
+    data = data.astype(complex)
 
     train, test = train_test_split(data, test_size=0.2, random_state=1)
     train, val = train_test_split(train, test_size=0.2, random_state=1)
 
     # Get the outputs and format them as np arrays
-    train_stats = train.describe()
-    train_stats.pop("pd")
-    train_stats = train_stats.transpose()
-    y_train = format_output(train, ["pd"])
-    y_test = format_output(test, ["pd"])
-    y_val = format_output(val, ["pd"])
+    y_train = format_output(train, output_heads)
+    y_test = format_output(test, output_heads)
+    y_val = format_output(val, output_heads)
 
     # Normalize the training and test data
-    x_train_normalized = train # np.array(norm(train, train_stats))
-    x_test_normalized = test # np.array(norm(test, train_stats))
-    x_val_normalized = val # np.array(norm(val, train_stats))
+    x_train_normalized = train
+    x_test_normalized = test
+    x_val_normalized = val 
 
     model = model_0(input_shape=(len(train.columns),))
 
     # Train the model for 200 epochs
-    history = model.fit(x_train_normalized, y_train, epochs=10, batch_size=10, validation_data=(x_test_normalized, y_test))
+    history = model.fit(x_train_normalized, y_train, epochs=1000, batch_size=10, validation_data=(x_test_normalized, y_test))
 
     evaluate_model(model, x_val_normalized, y_val, output_heads)
-    return
+    
+    # Save model
+    model.save("./model_0/", save_format="tf")
+
+    # Restore model
+    loaded_model = tf.keras.models.load_model("./model_0/")
+
     # Run predict
-    y_predictions = model.predict(x_test_normalized)
+    y_predictions = loaded_model.predict(x_test_normalized)
+    
     plot_predictions(y_test, y_predictions, history, output_heads)
 
 if __name__ == "__main__":

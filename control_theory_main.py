@@ -82,12 +82,12 @@ def main():
     print("closed-loop zeros: " + str(tf_nominator.roots()))
     print("closed-loop poles: " + str(tf_denominator.roots()))
     
-    line = [open_loop_nominator.coef, open_loop_denominator.coef, closed_loop_denominator.coef, closed_loop_poles[0].real, closed_loop_poles[1].real, closed_loop_poles[2].real, PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd.real, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef, tf_denominator.coef, tf_nominator.roots(), tf_denominator.roots()]
+    line = [open_loop_nominator.coef, open_loop_denominator.coef, closed_loop_denominator.coef, closed_loop_poles[0], closed_loop_poles[1], closed_loop_poles[2], PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef, tf_denominator.coef, tf_nominator.roots(), tf_denominator.roots()]
     write_results(line, "data.csv")
     print("")
     
 
 if __name__ == "__main__":
-    for i in range(10):
+    for i in range(1000):
         main()
     
