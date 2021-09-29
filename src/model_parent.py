@@ -3,18 +3,20 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 class ModelParent:
-    def __init__(self, model_name, data, unused_columns, output_heads):
+    def __init__(self, model_name, data, input_keys, output_keys):
         self.model_name = model_name
         self.data = data
-        self.output_heads = output_heads
-        self.drop_unused_columns(unused_columns)
+        self.input_keys = input_keys
+        self.output_keys = output_keys
+        self.drop_unused_columns()
         self.set_splits()
 
-    def drop_unused_columns(self, unused_columns):
-        unused_indexes = list(range(24))
-        for col in unused_columns:
-            unused_indexes.remove(col)
-        self.data = self.data.drop(self.data.columns[unused_indexes], axis=1)
+    def drop_unused_columns(self):
+        keys_to_drop = list(self.data.keys())
+        used_keys = self.input_keys + self.output_keys
+        for col in used_keys:
+            keys_to_drop.remove(col)
+        self.data = self.data.drop(keys_to_drop, axis=1)
         self.data = self.data.astype(complex)
 
     def set_splits(self):
@@ -26,7 +28,7 @@ class ModelParent:
     
     def format_output(self, data):
         y_list = []
-        for column in self.output_heads:
+        for column in self.output_keys:
             y_list.append(np.array(data.pop(column)))
         return y_list
 
@@ -38,15 +40,15 @@ class ModelParent:
         plt.show()
 
     def plot_predictions(self, loss_metric_name, mse_metric_name, Y_pred, history):
-        # for i in range(len(output_heads)):
-        #     plot_diff(test_Y[i], Y_pred[i], title=output_heads[i])
+        # for i in range(len(output_keys)):
+        #     plot_diff(test_Y[i], Y_pred[i], title=output_keys[i])
         # return
         # Plot RMSE
-        for head in self.output_heads:
+        for head in self.output_keys:
             self.plot_metrics(history, metric_name=mse_metric_name, title=head+" RMSE", ylim=15)
 
         # Plot loss
-        for head in self.output_heads:
+        for head in self.output_keys:
             self.plot_metrics(history, metric_name=loss_metric_name, title=head+" LOSS", ylim=50)
 
     def evaluate_model(self):
@@ -55,11 +57,11 @@ class ModelParent:
 
         print(f"\nloss: {losses_and_rmses[0]}")
         i = 1
-        for i in range(len(self.output_heads)):
-            print(f"{self.output_heads[i]} loss: {losses_and_rmses[i+1]}")
+        for i in range(len(self.output_keys)):
+            print(f"{self.output_keys[i]} loss: {losses_and_rmses[i+1]}")
         
-        for i in range(len(self.output_heads)):
-            print(f"{self.output_heads[i]} rmse: {losses_and_rmses[i+len(self.output_heads)]}")
+        for i in range(len(self.output_keys)):
+            print(f"{self.output_keys[i]} rmse: {losses_and_rmses[i+len(self.output_keys)]}")
     
     def train_predict_plot(self, epochs):
         self.model = self.define(input_shape=(len(self.train.columns),))
