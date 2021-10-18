@@ -10,6 +10,7 @@ class ModelParent:
         self.output_keys = output_keys
         self.drop_unused_columns()
         self.set_splits()
+        
 
     def drop_unused_columns(self):
         keys_to_drop = list(self.data.keys())
@@ -34,22 +35,21 @@ class ModelParent:
 
     def plot_metrics(self, history, metric_name, title, ylim=5):
         plt.title(title)
-        plt.ylim(0, ylim)
+        # plt.ylim(0, ylim)
         plt.plot(history.history[metric_name], color="blue", label=metric_name)
         plt.plot(history.history["val_"+metric_name], color="green", label="val_"+metric_name)
         plt.show()
 
-    def plot_predictions(self, loss_metric_name, mse_metric_name, Y_pred, history):
-        # for i in range(len(output_keys)):
-        #     plot_diff(test_Y[i], Y_pred[i], title=output_keys[i])
-        # return
-        # Plot RMSE
-        for head in self.output_keys:
-            self.plot_metrics(history, metric_name=mse_metric_name, title=head+" RMSE", ylim=15)
-
-        # Plot loss
-        for head in self.output_keys:
-            self.plot_metrics(history, metric_name=loss_metric_name, title=head+" LOSS", ylim=50)
+    def plot_predictions(self, y_pred, history):
+        print(y_pred)
+        return
+        self.plot_diff(self.y_test[0], y_pred)
+        return
+        for key in history.history.keys():
+            plt.title(key)
+            plt.plot(history.history[key], color="blue", label=key)
+            plt.show()
+        
 
     def evaluate_model(self):
         # Test the model and print loss and rmse for both outputs

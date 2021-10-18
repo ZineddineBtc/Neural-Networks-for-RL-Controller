@@ -11,6 +11,10 @@ from model_parent import ModelParent
 
 class Model_0(ModelParent):
 
+    # def __init__(self, model_name, data, input_keys, output_keys):
+    #     super().__init__(model_name, data, input_keys, output_keys)
+    #     self.data = self.data.astype(complex)
+
     def define(self, input_shape):
         # Input: 3 uncompensated closed-loop poles
         # Output: pd
@@ -40,5 +44,5 @@ class Model_0(ModelParent):
         plt.show()
 
     def plot_predictions(self, Y_pred, history):
-        super().plot_predictions("root_mean_squared_error", "loss", Y_pred, history)
+        super().plot_predictions(Y_pred, history)
     

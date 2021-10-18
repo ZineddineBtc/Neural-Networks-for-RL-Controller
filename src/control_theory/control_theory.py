@@ -1,9 +1,11 @@
 import numpy as np
 from numpy.polynomial import Polynomial as poly
 from numpy.random import rand
-from random import uniform, randrange
+from random import uniform
 from math import sqrt, exp, pi, acos, tan
 import csv
+
+from indexes import indexes
 
 def poles_generator():  # 2 dominant conjugates + negligible pole
     x = -1 * rand(1)
@@ -198,10 +200,9 @@ def print_specifications(PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_mi
     print("***********************************************")
 
 def write_results(line, csv_name):
-    # titles = ["uncompensated open-loop nominator", "uncompensated open-loop denominator", "uncompensated closed-loop denominator", "uclp 0", "uclp 1", "uclp 2", "PO max", "Ts max", "c min", "phase deficiency max", "sigma_d min", "pd", "pd phase", "new c", "new PO", "new Ts", "required additional phase", "Gc-z", "Gc-p", "Gc-k", "compensated closed-loop nominator", "compensated closed-loop denominator", "compensated closed-loop zeros", "compensated closed-loop poles"]
     outfile = open(csv_name, "a")
     out = csv.writer(outfile)
-    out.writerow(line)  # titles already written
+    out.writerow(line)  # indexes already written
     outfile.close()
 
 def read_results(path):

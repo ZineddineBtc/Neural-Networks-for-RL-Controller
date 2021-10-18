@@ -82,12 +82,13 @@ def main():
     print("closed-loop zeros: " + str(tf_nominator.roots()))
     print("closed-loop poles: " + str(tf_denominator.roots()))
     
-    line = [open_loop_nominator.coef, open_loop_denominator.coef, closed_loop_denominator.coef, closed_loop_poles[0], closed_loop_poles[1], closed_loop_poles[2], PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef, tf_denominator.coef, tf_nominator.roots(), tf_denominator.roots()]
-    write_results(line, "data.csv")
+    line = [open_loop_nominator.coef[0], open_loop_denominator.coef, closed_loop_denominator.coef[0], closed_loop_denominator.coef[1], closed_loop_denominator.coef[2], closed_loop_denominator.coef[3], closed_loop_poles[0].real, closed_loop_poles[0].imag, closed_loop_poles[1].real, closed_loop_poles[1].imag, closed_loop_poles[2].real, closed_loop_poles[2].imag, PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd.real, pd.imag, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef[0], tf_denominator, tf_denominator.roots()]
+    write_results(line, "data/data.csv")
     print("")
+    
     
 
 if __name__ == "__main__":
-    for i in range(1000):
+    for i in range(1000000):
         main()
     

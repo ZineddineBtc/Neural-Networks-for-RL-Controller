@@ -1,16 +1,16 @@
 from pandas import read_csv
 
-from model_0 import Model_0
+from root_locus_nn import RootLocusNN
 
 def main():
     data = read_csv("data/data.csv")
     
-    Model_0(
-        model_name="model_0", 
+    RootLocusNN(
         data=data, 
-        input_keys=["uclp 0", "uclp 1", "uclp 2"], 
-        output_keys=["pd"]
-    ).train_predict_plot(epochs=10)
+        input_keys=["uoln", "ucld 0", "ucld 1", "ucld 2"],
+        output_keys=["pd -r", "pd -i"],
+        standardScaler=True
+    ).fit_predict_plot(batch_size=10, epochs=5)
     
 
 if __name__ == "__main__":
