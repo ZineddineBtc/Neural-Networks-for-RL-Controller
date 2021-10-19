@@ -1,1 +1,6 @@
 venv
+/model_boston/*
+/models/*
+!/models/.gitkeep
+/plots/*
+!/plots/.gitkeep

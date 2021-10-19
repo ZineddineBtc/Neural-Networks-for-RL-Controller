@@ -5,7 +5,12 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 
 class RootLocusNN:
-    def __init__(self, data, input_keys, output_keys, standardScaler):
+    def __init__(self, model_name, data, input_keys, output_keys, standardScaler):
+        self.model_name = model_name
+        if standardScaler:
+            self.model_name += "_standarized"
+        else:
+            self.model_name += "_raw"
         self.input_keys = input_keys
         self.output_keys = output_keys
         self.set_data(data, standardScaler)
@@ -35,16 +40,17 @@ class RootLocusNN:
         self.model.summary()
     
     def plot(self):
-        # plt.title("Loss")
-        # plt.plot(self.history.history["loss"], color="blue", label="loss")
-        # plt.show()
+        plt.title("Loss")
+        plt.plot(self.history.history["loss"], color="blue", label="loss")
+        plt.savefig("./plots/loss_"+self.model_name)
         
-        if "pd -r" in self.output_keys:
-            self.plot_predictions(["Real Part", "Imaginary Part"])
+        self.plot_predictions(self.output_keys)
         
+
     def fit_predict_plot(self, batch_size, epochs):
         self.define_model()
         self.history = self.model.fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
+        self.model.save("./models/"+self.model_name)
         self.y_pred = self.model.predict(self.x_test)
         self.plot()
     
@@ -71,6 +77,6 @@ class RootLocusNN:
             axs[i].legend()
             if i+1!=len(titles):
                 axs[i].get_xaxis().set_ticks([])
-        plt.show()
+        plt.savefig("./plots/accuracy_"+self.model_name)
     
 

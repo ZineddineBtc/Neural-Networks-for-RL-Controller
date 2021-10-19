@@ -1,6 +1,10 @@
 indexes = [
     "uoln", 
-    "uold", 
+    
+    "uold 0", 
+    "uold 1", 
+    "uold 2", 
+    "uold 3",
 
     "ucld 0", 
     "ucld 1", 
@@ -34,6 +38,16 @@ indexes = [
     "Gc-k", 
 
     "ccln", 
-    "ccld", 
-    "cclp"
+
+    "ccld 0", 
+    "ccld 1", 
+    "ccld 2", 
+    "ccld 3",
+
+    "cclp 0 -r", 
+    "cclp 0 -i",
+    "cclp 1 -r", 
+    "cclp 1 -i",
+    "cclp 2 -r", 
+    "cclp 2 -i"
 ]
