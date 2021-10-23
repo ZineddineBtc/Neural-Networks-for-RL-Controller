@@ -10,14 +10,13 @@ def main():
 
     for input in possible_inputs:
         for output in possible_outputs:
-            for b in [True, False]:
-                RootLocusNN(
-                    model_name=input["name"]+"--"+output["name"],
-                    data=data, 
-                    input_keys=input["keys"],
-                    output_keys=output["keys"],
-                    standardScaler=b
-                ).fit_predict_plot(batch_size=10, epochs=epochs)
+            RootLocusNN(
+                model_name=input["name"]+"--"+output["name"],
+                data=data, 
+                input_keys=input["keys"],
+                output_keys=output["keys"],
+                scale=True
+            ).fit_predict_plot(batch_size=32, epochs=epochs)
 
     
 

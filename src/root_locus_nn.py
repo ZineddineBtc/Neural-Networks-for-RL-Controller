@@ -1,21 +1,19 @@
+import pandas as pd
+from pathlib import Path
 from matplotlib import pyplot as plt
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 
 class RootLocusNN:
-    def __init__(self, model_name, data, input_keys, output_keys, standardScaler):
+    def __init__(self, model_name, data, input_keys, output_keys, scale):
         self.model_name = model_name
-        if standardScaler:
-            self.model_name += "_standarized"
-        else:
-            self.model_name += "_raw"
         self.input_keys = input_keys
         self.output_keys = output_keys
-        self.set_data(data, standardScaler)
+        self.set_data(data, scale)
     
-    def set_data(self, data, standardScaler):
+    def set_data(self, data, scale):
         self.x = data[self.input_keys]
         self.x = self.x.astype(float)
         print("x info: ")
@@ -25,36 +23,43 @@ class RootLocusNN:
         print("y info: ")
         print(self.y.info())
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x, self.y, test_size=0.08, random_state=0)
-        if standardScaler:
-            sc = StandardScaler()
-            self.x_train = sc.fit_transform(self.x_train)
-            self.x_test = sc.transform(self.x_test)
+        if scale:
+            self.x_train = self.normalize(self.x_train)
+            self.x_test = self.normalize(self.x_test)
 
+    def normalize(self, df):
+        arr = df.values
+        min_max_scaler = MinMaxScaler()
+        arr_scaled = min_max_scaler.fit_transform(arr)
+        return pd.DataFrame(arr_scaled)
+        
     def define_model(self):
         self.model = Sequential()
         self.model.add(Dense(32, activation='relu', input_dim=len(self.input_keys)))
         self.model.add(Dense(units=128, activation='relu'))
         self.model.add(Dense(units=128, activation='relu'))
         self.model.add(Dense(len(self.output_keys), activation='linear'))
-        self.model.compile(optimizer='adam', loss='mean_squared_error')
+        self.model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
         self.model.summary()
-    
-    def plot(self):
-        plt.title("Loss")
-        plt.plot(self.history.history["loss"], color="blue", label="loss")
-        plt.savefig("./plots/loss_"+self.model_name)
         
-        self.plot_predictions(self.output_keys)
-        
-
     def fit_predict_plot(self, batch_size, epochs):
         self.define_model()
         self.history = self.model.fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
-        self.model.save("./models/"+self.model_name)
+        __model = self.model_name+"_epoch_"+str(epochs)
+        folder_path = "./main_results/"+__model
+        Path(folder_path+"/model").mkdir(parents=True, exist_ok=True)
+        Path(folder_path+"/plot").mkdir(parents=True, exist_ok=True)
+        self.model.save(folder_path+"/model")
         self.y_pred = self.model.predict(self.x_test)
-        self.plot()
+        self.plot_loss(folder_path+"/plot")
+        self.plot_predictions(folder_path+"/plot", self.output_keys)
     
-    def plot_predictions(self, titles):
+    def plot_loss(self, folder_path):
+        plt.title("Loss")
+        plt.plot(self.history.history["loss"], color="blue", label="loss")
+        plt.savefig(folder_path+"/loss_"+self.model_name)
+        
+    def plot_predictions(self, folder_path, titles):
         self.y_test = self.y_test.to_numpy()
         
         y_plot = []
@@ -77,6 +82,6 @@ class RootLocusNN:
             axs[i].legend()
             if i+1!=len(titles):
                 axs[i].get_xaxis().set_ticks([])
-        plt.savefig("./plots/accuracy_"+self.model_name)
+        plt.savefig(folder_path+"/accuracy_"+self.model_name)
     
 
