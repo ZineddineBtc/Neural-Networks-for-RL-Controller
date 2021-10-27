@@ -6,7 +6,7 @@ from root_locus_nn import RootLocusNN
 def main():
     data = read_csv("data/data.csv")
     
-    epochs = 5
+    epochs = 1
 
     for input in possible_inputs:
         for output in possible_outputs:
