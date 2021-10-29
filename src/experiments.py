@@ -8,16 +8,6 @@ from pathlib import Path
 from models_dict import possible_inputs, possible_outputs
 from root_locus_nn import RootLocusNN
 
-# def plot(subplotShape, data, keys, outputName):
-#     fig, axs = plt.subplots(subplotShape[0], subplotShape[1])
-#     for i in range(subplotShape[0]):
-#         for j in range(subplotShape[1]):
-#             axs[i][j].hist(data[keys[i+j]], bins=10)
-#             axs[i][j].set_title(keys[i+j])
-#             if i+1!=subplotShape[0]:
-#                 axs[i][j].get_xaxis().set_ticks([])
-
-#     plt.savefig("./general/distribution_"+outputName)
 
 def plot(title, column, bins, outputName, outputFolder):
     plt.hist(column, bins=bins)
@@ -36,7 +26,7 @@ def get_best_distribution(data):
         params[dist_name] = param
         # Applying the Kolmogorov-Smirnov test
         D, p = st.kstest(data, dist_name, args=param)
-        print("p value for "+dist_name+" = "+str(p))
+        # print("p value for "+dist_name+" = "+str(p))
         dist_results.append((dist_name, p))
 
     # select the best fitted distribution
@@ -45,7 +35,7 @@ def get_best_distribution(data):
 
     print("Best fitting distribution: "+str(best_dist))
     print("Best p value: "+ str(best_p))
-    print("Parameters for the best fit: "+ str(params[best_dist]))
+    print("Parameters for the best fit: "+ str(params[best_dist])+"\n")
 
     return best_dist, best_p, params[best_dist]
 
@@ -53,6 +43,8 @@ def distribution_experiment(data):
     input_keys = []
     for input in possible_inputs:
         input_keys += input["keys"]
+    input_keys += ["PO max", "Ts max"]
+    print(input_keys)
     input_keys = list(set(input_keys))
     input_keys.sort()
     for key in input_keys:
@@ -61,6 +53,7 @@ def distribution_experiment(data):
             bins=25,
             outputName="input_"+key.replace(" ", ""), 
             outputFolder="distribution/inputs/")
+        print("KEY: "+key)
         get_best_distribution(data[key])
     
     output_keys = []
@@ -74,37 +67,36 @@ def distribution_experiment(data):
             bins=25,
             outputName="output_"+key.replace(" ", ""), 
             outputFolder="distribution/outputs/")
+        print("KEY: "+key)
         get_best_distribution(data[key])
 
 def epochs_experiment(data):
     epoch_list = [5, 10, 20, 50, 100, 200, 500, 1000, 2000]
-    for input in possible_inputs:
-        for output in possible_outputs:
-            model_name = input["name"]+"--"+output["name"]
-            nn = RootLocusNN(
-                model_name=model_name,
-                data=data, 
-                input_keys=input["keys"],
-                output_keys=output["keys"],
-                scale=True)
-            nn.define_model()
+    model_name = "uoln-uclds--Gc"
+    nn = RootLocusNN(
+        model_name=model_name,
+        data=data, 
+        input_keys=["uoln", "ucld 0", "ucld 1", "ucld 2", "ucld 3"],
+        output_keys=["Gc-z", "Gc-p", "Gc-k"],
+        scale=True)
+    nn.define_model()
             
-            for epoch in epoch_list:
-                epoch_folder = "./experiments/epochs/"+model_name+"/"+str(epoch)
-                Path(epoch_folder).mkdir(parents=True, exist_ok=True)
-                history = nn.model.fit(nn.x_train, nn.y_train, validation_data=(nn.x_test,nn.y_test), batch_size=32, epochs=epoch)
-                for key in ["loss", "accuracy"]:
-                    plt.title(model_name +": "+ key +" ("+str(epoch)+" epochs)")
-                    plt.plot(history.history[key], label=key)
-                    plt.plot(history.history["val_"+key], label="validation "+key)
-                    plt.legend()
-                    plt.savefig(epoch_folder+"/"+key)
-                    plt.close()
+    for epoch in epoch_list:
+        epoch_folder = "./experiments/epochs/"+model_name+"/"+str(epoch)
+        Path(epoch_folder).mkdir(parents=True, exist_ok=True)
+        history = nn.model.fit(nn.x_train, nn.y_train, validation_data=(nn.x_test,nn.y_test), batch_size=32, epochs=epoch)
+        for key in ["loss", "accuracy"]:
+            plt.title(model_name +": "+ key +" ("+str(epoch)+" epochs)")
+            plt.plot(history.history[key], label=key)
+            plt.plot(history.history["val_"+key], label="validation "+key)
+            plt.legend()
+            plt.savefig(epoch_folder+"/"+key)
+            plt.close()
 
             
 def main():
     data = read_csv("data/data.csv")
-    # distribution_experiment(data, possible_inputs, possible_outputs)
+    # distribution_experiment(data)
     epochs_experiment(data)
 
 

@@ -9,7 +9,8 @@ from tensorflow.python.keras.layers import Dense
 class RootLocusNN:
     def __init__(self, model_name, data, input_keys, output_keys, scale):
         self.model_name = model_name
-        self.input_keys = input_keys
+        self.input_keys = ["PO max", "Ts max"]
+        self.input_keys += input_keys
         self.output_keys = output_keys
         self.set_data(data, scale)
     
