@@ -1,10 +1,13 @@
-import pandas as pd
+import pandas
 from pathlib import Path
 from matplotlib import pyplot as plt
+from numpy.polynomial import Polynomial as poly
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
+
+from control_theory import required_phase, compensator_zpk, closed_loop_tf, parameters_switch
 
 class RootLocusNN:
     def __init__(self, model_name, data, input_keys, output_keys, scale, loss="mean_squared_error"):
@@ -13,6 +16,7 @@ class RootLocusNN:
         self.input_keys = ["PO max", "Ts max"]
         self.input_keys += input_keys
         self.output_keys = output_keys
+        self.data = data
         self.set_data(data, scale)
     
     def set_data(self, data, scale):
@@ -33,7 +37,7 @@ class RootLocusNN:
         arr = df.values
         min_max_scaler = MinMaxScaler()
         arr_scaled = min_max_scaler.fit_transform(arr)
-        return pd.DataFrame(arr_scaled)
+        return pandas.DataFrame(arr_scaled)
         
     def define_model(self):
         self.model = Sequential()
@@ -55,6 +59,7 @@ class RootLocusNN:
         self.y_pred = self.model.predict(self.x_test)
         self.plot_loss(folder_path+"/plot")
         self.plot_predictions(folder_path+"/plot", self.output_keys)
+        self.check_specifications()
     
     def plot_loss(self, folder_path):
         plt.title("Loss")
@@ -85,3 +90,32 @@ class RootLocusNN:
             if i+1!=len(titles):
                 axs[i].get_xaxis().set_ticks([])
         plt.savefig(folder_path+"/accuracy_"+self.model_name)
+
+    def check_specifications(self):
+        
+        for i in range(len(self.y_pred)):
+            predicted_output, uoln, uolds, uolps, uolz, PO_max, Ts_max = self.get_vars(i)
+            if "pd -r" in self.output_keys:
+                pd = complex(predicted_output[0], predicted_output[1])
+                required_additional_phase = required_phase(pd, uolz, uolps)
+                zc, pc, kc = compensator_zpk("complex", pd, uolps, required_additional_phase, uoln, uolds)
+            else:
+                zc, pc, kc = predicted_output
+                
+            # tf_nominator, tf_denominator = closed_loop_tf("complex", zc, kc, pc, uoln, uolps)
+            # closed_loop_poles = tf_denominator.roots()
+            # print(zc, pc, kc, closed_loop_poles)
+            # c, PO, Ts = parameters_switch("distinct", closed_loop_poles)
+            
+        
+
+    def get_vars(self, i):
+        predicted_output = self.y_pred[i]
+        uoln = poly([self.data["uoln"][i]])
+        uolds = poly([self.data["uold 0"][i], self.data["uold 1"][i], self.data["uold 2"][i], self.data["uold 3"][i]])
+        uolps = [self.data["uolp 0"][i], self.data["uolp 1"][i], self.data["uolp 2"][i]]
+        uolz = []
+        PO_max = self.data["PO max"][i]
+        Ts_max = self.data["Ts max"][i]
+        return predicted_output, uoln, uolds, uolps, uolz, PO_max, Ts_max
+            

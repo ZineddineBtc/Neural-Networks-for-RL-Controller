@@ -14,14 +14,12 @@ def main():
                 input_keys=input["keys"],
                 output_keys=output["keys"],
                 scale=True,
-                loss=""
+                loss="mean_squared_error"
             )
-            model.fit_predict_plot(batch_size=32, epochs=20)
+            model.fit_predict_plot(batch_size=32, epochs=1)
             
 
-def check_results_stability():
-    ...
-    
+
 
 
 if __name__ == "__main__":

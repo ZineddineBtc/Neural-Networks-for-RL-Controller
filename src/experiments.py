@@ -98,8 +98,9 @@ def epochs_loss_experiment(data):
 def main():
     data = read_csv("data/data.csv")
     # distribution_experiment(data)
-    epochs_loss_experiment(data)
-
+    # epochs_loss_experiment(data)
+    uolds = [data["uold 0"][1], data["uold 1"][1], data["uold 2"][1], data["uold 3"][1]]
+    print(uolds)
 
 if __name__=="__main__":
     main()

@@ -33,12 +33,12 @@ def main():
 
     # 2nd order system (or approximation)
     if (len(closed_loop_poles)==2) or negligible:
-        type = check_poles_type(closed_loop_poles_significant)
+        poles_type = check_poles_type(closed_loop_poles_significant)
         try:    
-            c, PO, ts = parameters_switch(type, closed_loop_poles_significant)
+            c, PO, ts = parameters_switch(poles_type, closed_loop_poles_significant)
         except:
             return
-        print("closed loop poles: " + type + " => " + str(closed_loop_poles_significant)+"\n")
+        print("closed loop poles: " + poles_type + " => " + str(closed_loop_poles_significant)+"\n")
 
     # specifications
     PO_max, ts_max = specifications_generator(PO, ts)
@@ -54,7 +54,7 @@ def main():
         print("pd: " + str(pd))
         print("pd phase: "+str(pd_phase))
         try:
-            new_c, new_PO, new_ts = parameters_switch(type, [pd])
+            new_c, new_PO, new_ts = parameters_switch(poles_type, [pd])
         except:
             return
         is_PO_accepted = "accepted" if ((new_PO<=PO_max)and(new_PO>=0)) else "not accepted"
@@ -75,28 +75,30 @@ def main():
     print("\nrequired additional phase: " + str(required_additional_phase) + " °")
 
     # choosing zc such as an OL pole is cancelled 
-    zc, pc, kc = compensator_zpk(type, pd, open_loop_poles, required_additional_phase, open_loop_nominator, open_loop_denominator)
+    zc, pc, kc = compensator_zpk(poles_type, pd, open_loop_poles, required_additional_phase, open_loop_nominator, open_loop_denominator)
+    print(open_loop_nominator)
+    print(type(open_loop_nominator))
     print("Gc(s) = " + str(kc) + " * (s+" + str(-zc) + ") / (s+" + str(-pc) +")")
 
     if pc > 10 or pc < -10 or kc > 10 or kc < -10:
         return
 
-    tf_nominator, tf_denominator = closed_loop_tf(type, zc, kc, pc, open_loop_nominator, open_loop_poles)
+    tf_nominator, tf_denominator = closed_loop_tf(poles_type, zc, kc, pc, open_loop_nominator, open_loop_poles)
     print("")
     print("closed loop TF:")
     print("nominator: " + str(tf_nominator))
     print("denominator: " + str(tf_denominator))
     print("closed-loop zeros: " + str(tf_nominator.roots()))
     print("closed-loop poles: " + str(tf_denominator.roots()))
-    
+    return
     tf_poles = tf_denominator.roots()
-    line = [open_loop_nominator.coef[0], open_loop_denominator.coef[0], open_loop_denominator.coef[1], open_loop_denominator.coef[2], open_loop_denominator.coef[3], closed_loop_denominator.coef[0], closed_loop_denominator.coef[1], closed_loop_denominator.coef[2], closed_loop_denominator.coef[3], closed_loop_poles[0].real, closed_loop_poles[0].imag, closed_loop_poles[1].real, closed_loop_poles[1].imag, closed_loop_poles[2].real, closed_loop_poles[2].imag, PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd.real, pd.imag, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef[0], tf_denominator.coef[0], tf_denominator.coef[1], tf_denominator.coef[2], tf_denominator.coef[3], tf_poles[0].real, tf_poles[0].imag, tf_poles[1].real, tf_poles[1].imag, tf_poles[2].real, tf_poles[2].imag]
+    line = [open_loop_nominator.coef[0], open_loop_denominator.coef[0], open_loop_denominator.coef[1], open_loop_denominator.coef[2], open_loop_denominator.coef[3], open_loop_poles[0], open_loop_poles[1], open_loop_poles[2], closed_loop_denominator.coef[0], closed_loop_denominator.coef[1], closed_loop_denominator.coef[2], closed_loop_denominator.coef[3], closed_loop_poles[0].real, closed_loop_poles[0].imag, closed_loop_poles[1].real, closed_loop_poles[1].imag, closed_loop_poles[2].real, closed_loop_poles[2].imag, PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd.real, pd.imag, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef[0], tf_denominator.coef[0], tf_denominator.coef[1], tf_denominator.coef[2], tf_denominator.coef[3], tf_poles[0].real, tf_poles[0].imag, tf_poles[1].real, tf_poles[1].imag, tf_poles[2].real, tf_poles[2].imag]
     write_results(line, "data/data.csv")
     print("")
     
     
 
 if __name__ == "__main__":
-    for i in range(100000):
+    for i in range(1):
         main()
     
