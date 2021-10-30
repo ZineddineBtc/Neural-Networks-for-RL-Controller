@@ -1,5 +1,3 @@
-
-
 import scipy.stats as st
 import matplotlib.pyplot as plt
 from pandas import read_csv
@@ -70,34 +68,37 @@ def distribution_experiment(data):
         print("KEY: "+key)
         get_best_distribution(data[key])
 
-def epochs_experiment(data):
-    epoch_list = [5, 10, 20, 50, 100, 200, 500, 1000, 2000]
+def epochs_loss_experiment(data):
+    epoch_list = [10, 20, 50, 100, 200, 500]
+    losses = ["mean_squared_error", "mean_squared_logarithmic_error", "mean_absolute_error"]
     model_name = "uoln-uclds--Gc"
-    nn = RootLocusNN(
-        model_name=model_name,
-        data=data, 
-        input_keys=["uoln", "ucld 0", "ucld 1", "ucld 2", "ucld 3"],
-        output_keys=["Gc-z", "Gc-p", "Gc-k"],
-        scale=True)
-    nn.define_model()
-            
-    for epoch in epoch_list:
-        epoch_folder = "./experiments/epochs/"+model_name+"/"+str(epoch)
-        Path(epoch_folder).mkdir(parents=True, exist_ok=True)
-        history = nn.model.fit(nn.x_train, nn.y_train, validation_data=(nn.x_test,nn.y_test), batch_size=32, epochs=epoch)
-        for key in ["loss", "accuracy"]:
-            plt.title(model_name +": "+ key +" ("+str(epoch)+" epochs)")
+    for loss in losses:
+        nn = RootLocusNN(
+            model_name=model_name,
+            data=data, 
+            input_keys=["uoln", "ucld 0", "ucld 1", "ucld 2", "ucld 3"],
+            output_keys=["Gc-z", "Gc-p", "Gc-k"],
+            scale=True,
+            loss=loss)
+        nn.define_model()
+                
+        for epoch in epoch_list:
+            epoch_folder = "./experiments/epochs/"+loss
+            Path(epoch_folder).mkdir(parents=True, exist_ok=True)
+            history = nn.model.fit(nn.x_train, nn.y_train, validation_data=(nn.x_test,nn.y_test), batch_size=32, epochs=epoch)
+            key = "loss"
+            plt.title(key +" ("+str(epoch)+" epochs)")
             plt.plot(history.history[key], label=key)
             plt.plot(history.history["val_"+key], label="validation "+key)
             plt.legend()
-            plt.savefig(epoch_folder+"/"+key)
+            plt.savefig(epoch_folder+"/"+key+"_"+str(epoch))
             plt.close()
 
             
 def main():
     data = read_csv("data/data.csv")
     # distribution_experiment(data)
-    epochs_experiment(data)
+    epochs_loss_experiment(data)
 
 
 if __name__=="__main__":

@@ -7,8 +7,9 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 
 class RootLocusNN:
-    def __init__(self, model_name, data, input_keys, output_keys, scale):
+    def __init__(self, model_name, data, input_keys, output_keys, scale, loss="mean_squared_error"):
         self.model_name = model_name
+        self.loss = loss
         self.input_keys = ["PO max", "Ts max"]
         self.input_keys += input_keys
         self.output_keys = output_keys
@@ -40,7 +41,7 @@ class RootLocusNN:
         self.model.add(Dense(units=128, activation='relu'))
         self.model.add(Dense(units=128, activation='relu'))
         self.model.add(Dense(len(self.output_keys), activation='linear'))
-        self.model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
+        self.model.compile(optimizer='adam', loss=self.loss)
         self.model.summary()
         
     def fit_predict_plot(self, batch_size, epochs):
@@ -84,5 +85,3 @@ class RootLocusNN:
             if i+1!=len(titles):
                 axs[i].get_xaxis().set_ticks([])
         plt.savefig(folder_path+"/accuracy_"+self.model_name)
-    
-
