@@ -13,12 +13,21 @@ class RootLocusNN:
     def __init__(self, model_name, data, input_keys, output_keys, scale, loss="mean_squared_error"):
         self.model_name = model_name
         self.loss = loss
+        self.set_loss_abbr()
         self.input_keys = ["PO max", "Ts max"]
         self.input_keys += input_keys
         self.output_keys = output_keys
         self.data = data
         self.set_data(data, scale)
     
+    def set_loss_abbr(self):
+        if self.loss == "mean_squared_error":
+            self.loss_abbr = "mse"
+        elif self.loss == "mean_squared_logarithmic_error":
+            self.loss_abbr = "msle"
+        elif self.loss == "mean_absolute_error":
+            self.loss_abbr = "mae"
+
     def set_data(self, data, scale):
         self.x = data[self.input_keys]
         self.x = self.x.astype(float)
@@ -50,46 +59,61 @@ class RootLocusNN:
         
     def fit_predict_plot(self, batch_size, epochs):
         self.define_model()
-        self.history = self.model.fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs)
-        __model = self.model_name+"_epoch_"+str(epochs)
+        self.history = self.model.fit(self.x_train, self.y_train, validation_data=(self.x_test,self.y_test), batch_size=batch_size, epochs=epochs)
+        __model = self.model_name
         folder_path = "./main_results/"+__model
         Path(folder_path+"/model").mkdir(parents=True, exist_ok=True)
         Path(folder_path+"/plot").mkdir(parents=True, exist_ok=True)
         self.model.save(folder_path+"/model")
         self.y_pred = self.model.predict(self.x_test)
-        self.plot_loss(folder_path+"/plot")
-        self.plot_predictions(folder_path+"/plot", self.output_keys)
-        self.check_specifications()
+        self.rearrange_outputs(self.output_keys)
+        # self.plot_loss(folder_path+"/plot")
+        # self.plot_predictions(folder_path+"/plot", self.output_keys)
+        self.calculate_prediction_distortion()
+        # self.check_specifications()
     
+    def rearrange_outputs(self, titles):
+        self.y_test = self.y_test.to_numpy()  
+        self.y_rearrenged = []
+        for i in titles:
+            self.y_rearrenged.append([[], []])
+        for outputs in self.y_test:
+            for i in range(len(self.output_keys)):
+                self.y_rearrenged[i][0].append(outputs[i])
+        for outputs in self.y_pred:
+            for i in range(len(self.output_keys)):
+                self.y_rearrenged[i][1].append(outputs[i])
+
     def plot_loss(self, folder_path):
         plt.title("Loss")
-        plt.plot(self.history.history["loss"], color="blue", label="loss")
-        plt.savefig(folder_path+"/loss_"+self.model_name)
+        plt.plot(self.history.history["loss"], label="loss")
+        plt.plot(self.history.history["val_loss"], label="validation loss")
+        plt.legend()
+        plt.title(self.loss)
+        plt.savefig(folder_path+"/"+self.loss_abbr+"_loss")
+        plt.close()
         
-    def plot_predictions(self, folder_path, titles):
-        self.y_test = self.y_test.to_numpy()
-        
-        y_plot = []
-        for i in titles:
-            y_plot.append([[], []])
-
-        for outputs in self.y_test:
-            for i in range(len(titles)):
-                y_plot[i][0].append(outputs[i])
-        
-        for outputs in self.y_pred:
-            for i in range(len(titles)):
-                y_plot[i][1].append(outputs[i])
-        
+    def plot_predictions(self, folder_path, titles):      
         fig, axs = plt.subplots(len(titles))
         for i in range(len(titles)):
-            axs[i].plot(y_plot[i][0], label="expected")
-            axs[i].plot(y_plot[i][1], label="predicted")
+            axs[i].plot(self.y_rearrenged[i][0], label="expected")
+            axs[i].plot(self.y_rearrenged[i][1], label="predicted")
             axs[i].set_title("Prediction: "+titles[i])
             axs[i].legend()
             if i+1!=len(titles):
                 axs[i].get_xaxis().set_ticks([])
-        plt.savefig(folder_path+"/accuracy_"+self.model_name)
+        plt.suptitle(self.loss)
+        plt.tight_layout()
+        plt.savefig(folder_path+"/"+self.loss_abbr+"_predictions")
+        plt.close()
+
+    def calculate_prediction_distortion(self):
+        print(self.loss)
+        for i in range(len(self.output_keys)):
+            total_difference = 0
+            for j in range(len(self.y_rearrenged[0])):
+                total_difference += abs(self.y_rearrenged[i][j][0]-self.y_rearrenged[i][j][1])
+            print("total difference ("+self.output_keys[i]+"): "+str(total_difference))
 
     def check_specifications(self):
         
@@ -107,8 +131,6 @@ class RootLocusNN:
             # print(zc, pc, kc, closed_loop_poles)
             # c, PO, Ts = parameters_switch("distinct", closed_loop_poles)
             
-        
-
     def get_vars(self, i):
         predicted_output = self.y_pred[i]
         uoln = poly([self.data["uoln"][i]])

@@ -5,18 +5,18 @@ from root_locus_nn import RootLocusNN
 
 def main():
     data = read_csv("data/data.csv")
-    
-    for input in possible_inputs:
-        for output in possible_outputs:
-            model = RootLocusNN(
-                model_name=input["name"]+"--"+output["name"],
-                data=data, 
-                input_keys=input["keys"],
-                output_keys=output["keys"],
-                scale=True,
-                loss="mean_squared_error"
-            )
-            model.fit_predict_plot(batch_size=32, epochs=1)
+    for loss in ["mean_squared_error", "mean_squared_logarithmic_error", "mean_absolute_error"]:
+        for input in possible_inputs:
+            for output in possible_outputs:
+                model = RootLocusNN(
+                    model_name=input["name"]+"--"+output["name"],
+                    data=data, 
+                    input_keys=input["keys"],
+                    output_keys=output["keys"],
+                    scale=True,
+                    loss=loss
+                )
+                model.fit_predict_plot(batch_size=32, epochs=35)
             
 
 
