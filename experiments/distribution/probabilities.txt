@@ -1,0 +1,89 @@
+KEY: PO max
+norm = 0.0
+exponweib = 2.55e-32
+weibull_max = 0.0
+weibull_min = 1.13e-63
+pareto = 0.0
+genextreme = 9.65e-130
+Best fitting distribution: exponweib
+Best p value: 2.55e-32
+
+KEY: Ts max
+norm = 0.0
+exponweib = 0.0
+weibull_max = 0.0
+weibull_min = 0.0
+pareto = 0.0
+genextreme = 0.0
+Best fitting distribution: norm
+Best p value: 0.0
+
+KEY: uoln
+norm = 0.0
+exponweib = 0.0
+weibull_max = 0.0
+weibull_min = 0.0
+pareto = 0.0
+genextreme = 0.0
+Best fitting distribution: norm
+Best p value: 0.0
+
+KEY: uold 0
+norm = 0.0
+exponweib = 7.45e-18
+weibull_max = 1.35e-266
+weibull_min = 2.77e-60
+pareto = 0.0
+genextreme = 5.32e-164
+Best fitting distribution: exponweib
+Best p value: 7.45e-18
+
+KEY: uold 1
+norm = 2.80e-30
+exponweib = 8.49e-10
+weibull_max = 7.83e-16
+weibull_min = 9.45e-11
+pareto = 0.0
+genextreme = 7.89e-16
+Best fitting distribution: exponweib
+Best p value: 8.49e-10
+
+KEY: uold 2
+norm = 1.59e-56
+exponweib = 3.99e-30
+weibull_max = 4.20e-53
+weibull_min = 3.56e-49
+pareto = 0.0
+genextreme = 4.04e-53
+Best fitting distribution: exponweib
+Best p value: 3.99e-30
+
+KEY: Gc-z
+norm = 1.29e-277
+exponweib = 7.17e-24
+weibull_max = 2.26e-108
+weibull_min = 1.84e-79
+pareto = 4.532e-280
+genextreme = 3.52e-112
+Best fitting distribution: exponweib
+Best p value: 7.17e-24
+
+KEY: Gc-p
+norm = 1.73e-289
+exponweib = 2.74e-218
+weibull_max = 0.0
+weibull_min = 0.0
+pareto = 0.0
+genextreme = 0.0
+Best fitting distribution: exponweib
+Best p value: 2.74e-218
+
+KEY: Gc-k
+norm = 0.0
+exponweib = 1.53e-58
+weibull_max = 0.0
+weibull_min = 1.00e-85
+pareto = 0.0
+genextreme = 1.16e-209
+Best fitting distribution: exponweib
+Best p value: 1.53e-58
