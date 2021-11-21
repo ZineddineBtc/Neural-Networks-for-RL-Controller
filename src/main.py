@@ -10,7 +10,8 @@ def main():
         hiddenLayers_count=2,
         loss="mse"
     )
-    model.fit_predict_plot(batch_size=32, epochs=35)
+    model.fit_predict_plot(output_folder="./main_results/", toSave=True,
+                            batch_size=32, epochs=35)
             
 
 

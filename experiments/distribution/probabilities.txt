@@ -1,0 +1,98 @@
+KEY: PO max
+p value for norm = 0.0
+p value for exponweib = 2.550838428549178e-32
+p value for weibull_max = 0.0
+p value for weibull_min = 1.1358729815277945e-63
+p value for pareto = 0.0
+p value for genextreme = 9.65327851912231e-130
+Best fitting distribution: exponweib
+Best p value: 2.550838428549178e-32
+Parameters for the best fit: (2.3837492211340088, 0.6166235388389723, 0.001365354257860199, 4.772070285060897)
+
+KEY: Ts max
+p value for norm = 0.0
+p value for exponweib = 0.0
+p value for weibull_max = 0.0
+p value for weibull_min = 0.0
+p value for pareto = 0.0
+p value for genextreme = 0.0
+Best fitting distribution: norm
+Best p value: 0.0
+Parameters for the best fit: (32.13762512691685, 4839.355031143425)
+
+KEY: uoln
+p value for norm = 0.0
+p value for exponweib = 0.0
+p value for weibull_max = 0.0
+p value for weibull_min = 0.0
+p value for pareto = 0.0
+p value for genextreme = 0.0
+Best fitting distribution: norm
+Best p value: 0.0
+Parameters for the best fit: (5.710054946144844, 2.8009171059415876)
+
+KEY: uold 0
+p value for norm = 0.0
+p value for exponweib = 7.455172321948817e-18
+p value for weibull_max = 1.3535749654151785e-266
+p value for weibull_min = 2.770820553647685e-60
+p value for pareto = 0.0
+p value for genextreme = 5.320015382299543e-164
+Best fitting distribution: exponweib
+Best p value: 7.455172321948817e-18
+Parameters for the best fit: (0.6339560828517856, 1.3293771082659558, 3.3680573566018475e-05, 2.5392342769702907)
+
+KEY: uold 1
+p value for norm = 2.8070399489608142e-30
+p value for exponweib = 8.491044655394908e-10
+p value for weibull_max = 7.837008010530336e-16
+p value for weibull_min = 9.454998640074748e-11
+p value for pareto = 0.0
+p value for genextreme = 7.895809802165096e-16
+Best fitting distribution: exponweib
+Best p value: 8.491044655394908e-10
+Parameters for the best fit: (0.6225230048012329, 3.287900403792179, 0.20040857078563487, 9.005806817627125)
+
+KEY: uold 2
+p value for norm = 1.5965953749818899e-56
+p value for exponweib = 3.9903355428588125e-30
+p value for weibull_max = 4.207816456804988e-53
+p value for weibull_min = 3.56863275929731e-49
+p value for pareto = 0.0
+p value for genextreme = 4.0420816637246406e-53
+Best fitting distribution: exponweib
+Best p value: 3.9903355428588125e-30
+Parameters for the best fit: (0.39445646707915233, 4.880729030270914, 6.0490177581305975, 2.14903708341122)
+
+KEY: Gc-z
+p value for norm = 1.2964769396232435e-277
+p value for exponweib = 7.175567188233465e-24
+p value for weibull_max = 2.2632272110239157e-108
+p value for weibull_min = 1.8415345498007283e-79
+p value for pareto = 4.530258646593512e-280
+p value for genextreme = 3.520756134830959e-112
+Best fitting distribution: exponweib
+Best p value: 7.175567188233465e-24
+Parameters for the best fit: (0.22022368755543492, 3.9395237133725676, -0.9999975157869556, 0.6450289835893823)
+
+KEY: Gc-p
+p value for norm = 1.7320201214584987e-289
+p value for exponweib = 2.7494119639473046e-218
+p value for weibull_max = 0.0
+p value for weibull_min = 0.0
+p value for pareto = 0.0
+p value for genextreme = 0.0
+Best fitting distribution: exponweib
+Best p value: 2.7494119639473046e-218
+Parameters for the best fit: (20.180303706631932, 4.5522982179355225, -23.67255187627852, 16.786132751373593)
+
+KEY: Gc-k
+p value for norm = 0.0
+p value for exponweib = 1.5350182312684575e-58
+p value for weibull_max = 0.0
+p value for weibull_min = 1.0061600793516158e-85
+p value for pareto = 0.0
+p value for genextreme = 1.164489069752206e-209
+Best fitting distribution: exponweib
+Best p value: 1.5350182312684575e-58
+Parameters for the best fit: (0.6125531039986656, 1.1407814080226926, 1.4527219168511866e-05, 4.012201273511466)

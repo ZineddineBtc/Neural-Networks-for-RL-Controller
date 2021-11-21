@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from pandas import read_csv
 from pathlib import Path
 
-from models_dict import possible_inputs, possible_outputs
 from root_locus_nn import RootLocusNN
 
 
@@ -48,6 +47,7 @@ def epoch_experiment(data):
     epoch_list = [10, 20, 50, 100, 200, 500]
     nn = RootLocusNN(
         data=data, 
+        test_split=0.2,
         scale=True,
         hiddenLayers_count=3,
         loss="mse")
@@ -63,37 +63,58 @@ def epoch_experiment(data):
         plt.savefig(epoch_folder+"/"+str(epoch))
         plt.close()
 
-def loss_experiment(data):
-    epoch_list = [10, 20, 50, 100, 200, 500]
-    losses = ["mean_squared_error", "mean_squared_logarithmic_error", "mean_absolute_error"]
-    model_name = "uoln-uclds--Gc"
-    for loss in losses:
-        nn = RootLocusNN(
-            model_name=model_name,
+def hiddenLayers_experiment(data):
+    hiddenLayers_options = [1, 2, 3, 4, 5, 6]
+    for count in hiddenLayers_options:
+        Path("./experiments/hidden-layers/count-"+str(count)).mkdir(parents=True, exist_ok=True)
+        RootLocusNN(
             data=data, 
-            input_keys=["uoln", "ucld 0", "ucld 1", "ucld 2", "ucld 3"],
-            output_keys=["Gc-z", "Gc-p", "Gc-k"],
+            test_split=0.2,
             scale=True,
-            loss=loss)
-        nn.define_model()
-                
-        for epoch in epoch_list:
-            epoch_folder = "./experiments/epochs/"+loss
-            Path(epoch_folder).mkdir(parents=True, exist_ok=True)
-            history = nn.model.fit(nn.x_train, nn.y_train, validation_data=(nn.x_test,nn.y_test), batch_size=32, epochs=epoch)
-            key = "loss"
-            plt.title(key +" ("+str(epoch)+" epochs)")
-            plt.plot(history.history[key], label=key)
-            plt.plot(history.history["val_"+key], label="validation "+key)
-            plt.legend()
-            plt.savefig(epoch_folder+"/"+key+"_"+str(epoch))
-            plt.close()
+            hiddenLayers_count=count,
+            loss="mse").fit_predict_plot(
+                output_folder="./experiments/hidden-layers/count-"+str(count)+"/",
+                toSave=False, batch_size=32, epochs=35)
 
-            
+def loss_experiment(data):
+    losses = ["mse", "msle", "mae"]
+    epochs = 35
+    hiddenLayers_count = 2
+    for loss in losses:
+        Path("./experiments/loss/"+loss).mkdir(parents=True, exist_ok=True)
+        RootLocusNN(
+            data=data, 
+            test_split=0.2,
+            scale=True,
+            hiddenLayers_count=hiddenLayers_count,
+            loss=loss).fit_predict_plot(
+                output_folder="./experiments/loss/"+loss+"/",
+                toSave=False, batch_size=32, epochs=epochs)
+
+def testSplit_experiment(data):
+    loss = "mse"
+    epochs = 35
+    hiddenLayers_count = 2
+    splits = [0.1, 0.3, 0.5, 0.7]
+    for split in splits:
+        folder = "./experiments/test-split/split_"+str(split)
+        Path(folder).mkdir(parents=True, exist_ok=True)
+        RootLocusNN(
+            data=data, 
+            test_split=split,
+            scale=True,
+            hiddenLayers_count=hiddenLayers_count,
+            loss=loss).fit_predict_plot(
+                output_folder=folder+"/", toSave=False, 
+                batch_size=32, epochs=epochs)
+
 def main():
     data = read_csv("data/data.csv")
-    # distribution_experiment(data)
+    distribution_experiment(data)
     epoch_experiment(data)
+    hiddenLayers_experiment(data)
+    loss_experiment(data)
+    testSplit_experiment(data)
 
 if __name__=="__main__":
     main()

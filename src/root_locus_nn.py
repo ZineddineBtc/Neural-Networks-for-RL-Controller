@@ -10,9 +10,10 @@ from tensorflow.python.keras.layers import Dense
 # from control_theory import required_phase, compensator_zpk, closed_loop_tf, parameters_switch
 
 class RootLocusNN:
-    def __init__(self, data, scale, hiddenLayers_count, loss="mean_squared_error"):
+    def __init__(self, data, test_split, scale, hiddenLayers_count, loss="mean_squared_error"):
         self.input_keys = ["PO max", "Ts max", "uoln", "uold 0", "uold 1", "uold 2"]
         self.output_keys = ["Gc-z", "Gc-p", "Gc-k"]  
+        self.test_split = test_split
         self.data = data
         self.set_data(data, scale)
         self.hiddenLayers_count = hiddenLayers_count-1  # output-layer: Dense() => hidden-layer
@@ -29,7 +30,7 @@ class RootLocusNN:
         self.y = self.y.astype(float)
         print("y info: ")
         print(self.y.info())
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x, self.y, test_size=0.2, random_state=0)
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x, self.y, test_size=self.test_split, random_state=0)
         if scale:
             self.x_train = self.normalize(self.x_train)
             self.x_test = self.normalize(self.x_test)
@@ -43,23 +44,23 @@ class RootLocusNN:
     def define_model(self):
         self.model = Sequential()
         self.model.add(Dense(32, activation='relu', input_dim=len(self.input_keys)))
-        for i in range(self.hiddenLayers_count-1):
+        for i in range(self.hiddenLayers_count):
             self.model.add(Dense(units=128, activation='relu'))
         self.model.add(Dense(len(self.output_keys), activation='linear'))
         self.model.compile(optimizer='adam', loss=self.loss)
         self.model.summary()
         
-    def fit_predict_plot(self, batch_size, epochs):
+    def fit_predict_plot(self, output_folder, toSave, batch_size, epochs):
         self.define_model()
         self.history = self.model.fit(self.x_train, self.y_train, validation_data=(self.x_test,self.y_test), batch_size=batch_size, epochs=epochs)
-        folder_path = "./main_results/"
-        Path(folder_path+"/model").mkdir(parents=True, exist_ok=True)
-        Path(folder_path+"/plot").mkdir(parents=True, exist_ok=True)
-        self.model.save(folder_path+"/model")
+        if toSave:
+            Path(output_folder+"/model").mkdir(parents=True, exist_ok=True)
+            self.model.save(output_folder+"/model")
         self.y_pred = self.model.predict(self.x_test)
         self.rearrange_outputs(self.output_keys)
-        self.plot_loss(folder_path+"/plot")
-        self.plot_predictions(folder_path+"/plot", self.output_keys)
+        Path(output_folder+"/plot").mkdir(parents=True, exist_ok=True)
+        self.plot_loss(output_folder+"/plot")
+        self.plot_predictions(output_folder+"/plot", self.output_keys)
         self.calculate_prediction_distortion()
     
     def rearrange_outputs(self, titles):
@@ -99,11 +100,11 @@ class RootLocusNN:
 
     def calculate_prediction_distortion(self):
         print(self.loss)
-        for i in range(len(self.output_keys)):
-            total_difference = 0
+        total_difference = 0
+        for i in range(len(self.output_keys)):   
             for j in range(len(self.y_rearrenged[0])):
                 total_difference += abs(self.y_rearrenged[i][j][0]-self.y_rearrenged[i][j][1])
-            print("total difference ("+self.output_keys[i]+"): "+str(total_difference))
+        print("total difference: "+str(total_difference))
 
     # def check_specifications(self):      
     #     for i in range(len(self.y_pred)):

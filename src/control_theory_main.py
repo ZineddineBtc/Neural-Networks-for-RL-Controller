@@ -90,7 +90,7 @@ def main():
     print("denominator: " + str(tf_denominator))
     print("closed-loop zeros: " + str(tf_nominator.roots()))
     print("closed-loop poles: " + str(tf_denominator.roots()))
-    return
+    
     tf_poles = tf_denominator.roots()
     line = [open_loop_nominator.coef[0], open_loop_denominator.coef[0], open_loop_denominator.coef[1], open_loop_denominator.coef[2], open_loop_denominator.coef[3], open_loop_poles[0], open_loop_poles[1], open_loop_poles[2], closed_loop_denominator.coef[0], closed_loop_denominator.coef[1], closed_loop_denominator.coef[2], closed_loop_denominator.coef[3], closed_loop_poles[0].real, closed_loop_poles[0].imag, closed_loop_poles[1].real, closed_loop_poles[1].imag, closed_loop_poles[2].real, closed_loop_poles[2].imag, PO_max, ts_max, c_min, phase_deficiency_max, sigma_d_min, pd.real, pd.imag, pd_phase, new_c, new_PO, new_ts, required_additional_phase, zc, pc, kc, tf_nominator.coef[0], tf_denominator.coef[0], tf_denominator.coef[1], tf_denominator.coef[2], tf_denominator.coef[3], tf_poles[0].real, tf_poles[0].imag, tf_poles[1].real, tf_poles[1].imag, tf_poles[2].real, tf_poles[2].imag]
     write_results(line, "data/data.csv")
@@ -99,6 +99,6 @@ def main():
     
 
 if __name__ == "__main__":
-    for i in range(13000):
+    for i in range(100000):
         main()
     
