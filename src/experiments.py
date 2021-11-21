@@ -74,7 +74,7 @@ def hiddenLayers_experiment(data):
             hiddenLayers_count=count,
             loss="mse").fit_predict_plot(
                 output_folder="./experiments/hidden-layers/count-"+str(count)+"/",
-                toSave=False, batch_size=32, epochs=35)
+                toSave=False, batch_size=32, epochs=35, predictions_title=str(count))
 
 def loss_experiment(data):
     losses = ["mse", "msle", "mae"]
@@ -89,7 +89,7 @@ def loss_experiment(data):
             hiddenLayers_count=hiddenLayers_count,
             loss=loss).fit_predict_plot(
                 output_folder="./experiments/loss/"+loss+"/",
-                toSave=False, batch_size=32, epochs=epochs)
+                toSave=False, batch_size=32, epochs=epochs, predictions_title=loss)
 
 def testSplit_experiment(data):
     loss = "mse"
@@ -106,7 +106,7 @@ def testSplit_experiment(data):
             hiddenLayers_count=hiddenLayers_count,
             loss=loss).fit_predict_plot(
                 output_folder=folder+"/", toSave=False, 
-                batch_size=32, epochs=epochs)
+                batch_size=32, epochs=epochs, predictions_title=str(split))
 
 def main():
     data = read_csv("data/data.csv")

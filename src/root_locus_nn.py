@@ -50,7 +50,7 @@ class RootLocusNN:
         self.model.compile(optimizer='adam', loss=self.loss)
         self.model.summary()
         
-    def fit_predict_plot(self, output_folder, toSave, batch_size, epochs):
+    def fit_predict_plot(self, output_folder, toSave, batch_size, epochs, predictions_title):
         self.define_model()
         self.history = self.model.fit(self.x_train, self.y_train, validation_data=(self.x_test,self.y_test), batch_size=batch_size, epochs=epochs)
         if toSave:
@@ -60,7 +60,7 @@ class RootLocusNN:
         self.rearrange_outputs(self.output_keys)
         Path(output_folder+"/plot").mkdir(parents=True, exist_ok=True)
         self.plot_loss(output_folder+"/plot")
-        self.plot_predictions(output_folder+"/plot", self.output_keys)
+        self.plot_predictions(output_folder+"/plot", self.output_keys, predictions_title)
         self.calculate_prediction_distortion()
     
     def rearrange_outputs(self, titles):
@@ -84,7 +84,7 @@ class RootLocusNN:
         plt.savefig(folder_path+"/loss")
         plt.close()
         
-    def plot_predictions(self, folder_path, titles):      
+    def plot_predictions(self, folder_path, titles, predictions_title):      
         fig, axs = plt.subplots(len(titles))
         for i in range(len(titles)):
             axs[i].plot(self.y_rearrenged[i][0], label="expected")
@@ -93,7 +93,7 @@ class RootLocusNN:
             axs[i].legend()
             if i+1!=len(titles):
                 axs[i].get_xaxis().set_ticks([])
-        plt.suptitle(self.loss)
+        plt.suptitle(predictions_title)
         plt.tight_layout()
         plt.savefig(folder_path+"/predictions")
         plt.close()
